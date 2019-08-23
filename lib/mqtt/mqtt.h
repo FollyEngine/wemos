@@ -3,8 +3,9 @@
   Created by Sven Dowideit, 2018.
   Released into the public domain.
 */
-#ifndef Morse_h
-#define Morse_h
+
+#ifndef FollyEngine_MQTT_h
+#define FollyEngine_MQTT_h
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
