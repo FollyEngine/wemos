@@ -9,7 +9,7 @@ void updateColourRGB(Adafruit_NeoPixel &leds, int red, int green, int blue);
 
 void updateColour(Adafruit_NeoPixel &leds, const char * colourName);
 
-void pixie_dust(Adafruit_NeoPixel &leds, int bright);
+void pixie_dust(Adafruit_NeoPixel &leds, int bright, unsigned long twinkleDelay);
 // Fadeout... starts at bright white and fades to almost zero
 void fadeout(Adafruit_NeoPixel & leds);
 

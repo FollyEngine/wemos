@@ -40,6 +40,7 @@ class NeopixelString: public Device {
     boolean initialised = false;
     boolean inLoop = false;
 
+    unsigned long twinkleDelay;
     unsigned long twinkleUntil = 0;
 };
 

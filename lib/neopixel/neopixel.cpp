@@ -47,8 +47,7 @@ void NeopixelString::loop() {
     // sparkle each led once (but in random order, so some of them might sparkle twice and some not at all)
     // TODO actually just choose a random LED and sparkle it, since this loop now repeats every time
     //for (int i = 0; i < ledNum; i++) {
-    pixie_dust(*left_leds, 5);
-    delay(2);
+    pixie_dust(*left_leds, 5, twinkleDelay);
     //}
   }
 }
@@ -81,6 +80,7 @@ void NeopixelString::mqtt_callback_fn(const char* topic, const char* payload, un
     }
     if (strcmp(operation, "twinkle") == 0) {
       unsigned long duration = obj["duration"] | 1000; // default to one second
+      twinkleDelay = obj["delay"] | 5;
       twinkleUntil = millis() + duration;
     }
   }
