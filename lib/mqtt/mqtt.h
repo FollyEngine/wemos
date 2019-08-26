@@ -17,7 +17,7 @@
 #include <ArduinoJson.h>
 
 // Send a Status update every 60 seconds
-#define STATUSRATE (60)
+#define STATUSRATE (1)
 
 class Mqtt
 {

@@ -73,7 +73,7 @@ void Mqtt::setup() {
 #endif
     while (WiFi.status() != WL_CONNECTED) {
       Serial.println(".");
-      delay(500);
+      delay(300);
     }
 
     Serial.println("Setup Wifi Connected:");
@@ -88,11 +88,16 @@ void Mqtt::setup() {
     Serial.printf("Host %s, Port %d", m_MQTTServer, m_MQTTPort);
     client.setServer(m_MQTTServer, m_MQTTPort);
     client.setCallback(callback);
+
+    StaticJsonBuffer<300> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    status(root);
   };
 
 
 bool Mqtt::loop() {
     bool reInit = true;
+
     while (!client.connected()) {
       reInit = false;
       while (!client.connected()) {
@@ -134,7 +139,7 @@ bool Mqtt::loop() {
   };
 
   void Mqtt::publish(const char *object, const char *verb, JsonObject& root) {
-    char str[201];
+    char str[301];
     // TODO: only set it if its not already set
     root["device"] = String(object);
     // TODO: only set it if its not already set
@@ -143,7 +148,7 @@ bool Mqtt::loop() {
     snprintf(str, 100, "%d-%02d-%02dT%02d:%02d:%02d", year(t), month(t), day(t), hour(t), minute(t), second(t));
     root["time"] = String(str);
 
-    root.printTo(str, 200);
+    root.printTo(str, 300);
     publishString(object, verb, str);
   };
 
