@@ -16,7 +16,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.10.10.129", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "one", 1883, "multipass");
 
 Device *devices[5];
 int deviceCount = 0;
@@ -54,9 +54,9 @@ void setup() {
 // example for more information on possible values.
 //#define LEDPIN   D5
 //#define LED_NUM 50
-//  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
-  devices[deviceCount++] = new MotorDevice(&mqtt); // RGB
+//  devices[deviceCount++] = new MotorDevice(&mqtt);
 
 
   //devices[0]->setup();
