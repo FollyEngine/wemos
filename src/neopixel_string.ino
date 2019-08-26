@@ -1,6 +1,7 @@
 #include "secrets.h"
 #include <mqtt.h>
 #include <neopixel.h>
+#include <motor.h>
 
 //
 //breif:
@@ -21,6 +22,8 @@ Device *devices[5];
 int deviceCount = 0;
 
 void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int length) {
+  Serial.printf("Callback: %s\r\n", topic);
+
   char payload[256];
   strncpy(payload, (char *) raw_payload, length);
   payload[length] = 0;
@@ -44,14 +47,17 @@ void setup() {
 // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
 // #define LEDPIN   D4
 // #define LED_NUM 7
-  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+//  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
 //#define LEDPIN   D5
 //#define LED_NUM 50
-  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+//  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+
+  devices[deviceCount++] = new MotorDevice(&mqtt); // RGB
+
 
   //devices[0]->setup();
   for (int i = 0; i < deviceCount; i++) {

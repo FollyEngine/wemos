@@ -2,15 +2,9 @@
 #ifndef FollyEngine_NeopixelString_h
 #define FollyEngine_NeopixelString_h
 
+#include <device.h>
 #include <mqtt.h>
 #include <Adafruit_NeoPixel.h>
-
-class Device {
-    public:
-    virtual void setup();
-    virtual void loop();
-    virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
-};
 
 class NeopixelString: public Device {
     public:
