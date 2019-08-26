@@ -56,10 +56,12 @@ void NeopixelString::loop() {
 
 void NeopixelString::mqtt_callback_fn(const char* topic, const char* payload, unsigned int length) {
   // 10 elements in the json payload?
-  DynamicJsonBuffer jb(JSON_OBJECT_SIZE(10));
-  JsonObject& obj = jb.parseObject(payload);
-  if (!obj.success()) {
-    Serial.printf("Failed to parse JSON\n");
+//   DynamicJsonBuffer jb(JSON_OBJECT_SIZE(10));
+//   JsonObject& obj = jb.parseObject(payload);
+  StaticJsonDocument<300> obj;
+  DeserializationError error = deserializeJson(obj, payload);
+  if (error) {
+    Serial.printf("Failed to parse JSON: %s\n", error.c_str());
     return;
   }
 

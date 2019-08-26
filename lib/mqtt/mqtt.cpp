@@ -89,8 +89,7 @@ void Mqtt::setup() {
     client.setServer(m_MQTTServer, m_MQTTPort);
     client.setCallback(callback);
 
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject& root = jsonBuffer.createObject();
+    StaticJsonDocument<300> root;
     status(root);
   };
 
@@ -123,8 +122,7 @@ bool Mqtt::loop() {
       if (time_now - m_lastStatus > (STATUSRATE)) {
         m_lastStatus = time_now;
 
-        StaticJsonBuffer<300> jsonBuffer;
-        JsonObject& root = jsonBuffer.createObject();
+        StaticJsonDocument<300> root;
         status(root);
       }
     }
@@ -138,7 +136,7 @@ bool Mqtt::loop() {
     client.publish(topic, message);
   };
 
-  void Mqtt::publish(const char *object, const char *verb, JsonObject& root) {
+  void Mqtt::publish(const char *object, const char *verb, JsonDocument& root) {
     char str[301];
     // TODO: only set it if its not already set
     root["device"] = String(object);
@@ -148,13 +146,13 @@ bool Mqtt::loop() {
     snprintf(str, 100, "%d-%02d-%02dT%02d:%02d:%02d", year(t), month(t), day(t), hour(t), minute(t), second(t));
     root["time"] = String(str);
 
-    root.printTo(str, 300);
+    serializeJson(root, str);
     publishString(object, verb, str);
   };
 
   //String hello = String("hello");
   char str[301];
-  void Mqtt::status(JsonObject& root) {
+  void Mqtt::status(JsonDocument& root) {
     // TODO: only set it if its not already set
     root["ip"] = WiFi.localIP().toString();
 //    root["device"] = String(m_Object);
@@ -167,7 +165,7 @@ bool Mqtt::loop() {
     snprintf(str, 100, "%d-%02d-%02dT%02d:%02d:%02d", year(t), month(t), day(t), hour(t), minute(t), second(t));
     root["time"] = String(str);
 
-    root.printTo(str, 300);
+    serializeJson(root, str);
     statusString(str);
   };
 
