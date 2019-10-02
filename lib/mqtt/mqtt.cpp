@@ -93,33 +93,41 @@ void Mqtt::setup() {
     status(root);
   };
 
-
-bool Mqtt::loop() {
+  bool Mqtt::loop()
+  {
     bool reInit = true;
 
-    while (!client.connected()) {
+    while (!client.connected())
+    {
       reInit = false;
-      while (!client.connected()) {
+      while (!client.connected())
+      {
         Serial.println("Wifi Connected:");
-        Serial.println( WiFi.localIP());
-        Serial.println( m_Hostname);
+        Serial.println(WiFi.localIP());
+        Serial.println(m_Hostname);
 
-	if (m_MqttPass == NULL) {
-          client.connect(m_Hostname);
-        } else {
-          Serial.printf("Host %s, Port %d", m_MQTTServer, m_MQTTPort);
-          boolean ok = client.connect(m_Hostname, m_MqttUser, m_MqttPass);
-          Serial.printf("MQTT: %s", (ok?"true":"false"));
+        Serial.printf("Host %s, Port %d\r\n", m_MQTTServer, m_MQTTPort);
+        boolean ok;
+        if (m_MqttPass == NULL)
+        {
+          ok = client.connect(m_Hostname);
         }
-        Serial.println("+");
+        else
+        {
+          ok = client.connect(m_Hostname, m_MqttUser, m_MqttPass);
+        }
+        Serial.printf("MQTT: %s (state: %d)\r\n", (ok ? "true" : "false"), client.state());
+        //Serial.println("+");
       }
       client.setCallback(callback);
     }
     client.loop();
 
-    if (client.connected()) {
+    if (client.connected())
+    {
       time_t time_now = now();
-      if (time_now - m_lastStatus > (STATUSRATE)) {
+      if (time_now - m_lastStatus > (STATUSRATE))
+      {
         m_lastStatus = time_now;
 
         StaticJsonDocument<300> root;

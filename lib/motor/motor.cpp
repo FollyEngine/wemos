@@ -38,7 +38,7 @@ void MotorDevice::loop() {
     delay(1);
     initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "speed");
     initialised = mqtt->subscribe("all", deviceType, "speed");
-    Serial.printf("loop Subscription returned: %s\n", initialised ? "true" : "false");
+    Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
 
     setup();
   }

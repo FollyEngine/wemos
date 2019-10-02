@@ -54,9 +54,9 @@ void setup() {
 // example for more information on possible values.
 //#define LEDPIN   D5
 //#define LED_NUM 50
-  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+//  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
-//  devices[deviceCount++] = new MotorDevice(&mqtt);
+  devices[deviceCount++] = new MotorDevice(&mqtt);
 
 
   //devices[0]->setup();
