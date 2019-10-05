@@ -2,6 +2,7 @@
 #include <mqtt.h>
 #include <neopixel.h>
 #include <motor.h>
+#include <touch.h>
 
 //
 //breif:
@@ -16,7 +17,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt.home.org.au", 1883, "multipass");
 
 Device *devices[5];
 int deviceCount = 0;
@@ -56,7 +57,8 @@ void setup() {
 //#define LED_NUM 50
 //  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
-  devices[deviceCount++] = new MotorDevice(&mqtt);
+//  devices[deviceCount++] = new MotorDevice(&mqtt);
+  devices[deviceCount++] = new TouchDevice(&mqtt);
 
 
   //devices[0]->setup();
