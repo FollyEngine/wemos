@@ -3,7 +3,7 @@
 
 
 // this function sets all the pixels in a group to the same colour
-void leds_set(Adafruit_NeoPixel &leds, uint8 R, uint8 G, uint8 B);
+void leds_set(Adafruit_NeoPixel &leds, uint8_t R, uint8_t G, uint8_t B);
 
 void updateColourRGB(Adafruit_NeoPixel &leds, int red, int green, int blue);
 

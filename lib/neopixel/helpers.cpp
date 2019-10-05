@@ -3,7 +3,7 @@
 
 
 // this function sets all the pixels in a group to the same colour
-void leds_set(Adafruit_NeoPixel &leds, uint8 R, uint8 G, uint8 B) {
+void leds_set(Adafruit_NeoPixel &leds, uint8_t R, uint8_t G, uint8_t B) {
   for (uint16_t i = 0; i < leds.numPixels(); i++) {
     leds.setPixelColor(i, R, G, B);
     leds.show();
@@ -76,9 +76,9 @@ bool oldState = HIGH; //sets the initial variable for counting touch sensor butt
 
 void pixie_dust(Adafruit_NeoPixel &leds, int bright, unsigned long twinkleDelay) {
   //color (0-255) values to be set by cycling touch switch, initially GOLD
-  uint8 red = currentColours[0];
-  uint8 green = currentColours[1];
-  uint8 blue = currentColours[2];
+  uint8_t red = currentColours[0];
+  uint8_t green = currentColours[1];
+  uint8_t blue = currentColours[2];
 
   //sparkling
   int p = random(leds.numPixels()); //select a random pixel
