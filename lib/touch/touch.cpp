@@ -10,6 +10,7 @@ TouchDevice::TouchDevice(Mqtt *m) {
 void TouchDevice::setup() {
   //Serial.begin(115200);
   //Serial.println("ESP32 Touch Interrupt Test");
+  threshold = 40;
 }
 
 void TouchDevice::loop() {
@@ -30,15 +31,15 @@ void TouchDevice::loop() {
 
   bool stateChange = false;
   for (int i=0; i<8; i++) {
-    int16_t reading = touchRead(i);
-    if (reading >= threshold) {
+    int16_t reading = touchRead(pinMap[i]);
+    if (reading <= threshold) {
       current[i] = true;
     }
     if (current[i] == last[i] && last[i] != touchState[i]) {
       // need to report this as a state change.
       stateChange = true;
       touchState[i] = current[i];
-      Serial.printf("Touch %d detected\n", i);
+      Serial.printf("Touch %d detected\r\n", i);
       snprintf(name, 16, "touch%d", i);
       root[name] = touchState[i];
     }
@@ -48,14 +49,14 @@ void TouchDevice::loop() {
     current[i] = false;
   }
   if (stateChange) {
-      mqtt->publish(mqtt->getHostname(), "touch", root);
+      mqtt->publish(mqtt->getObject(), "touch", root);
   }
   
-  Serial.printf("w(%s) %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n",
-    (stateChange?"true":"false"),
-    // touchState[0], touchState[1], touchState[2], touchState[3], touchState[4],
-    // touchState[5], touchState[6], touchState[7]);
-    touchRead(T0), touchRead(T1), touchRead(T2), touchRead(T3), touchRead(T4), touchRead(T5), touchRead(T6), touchRead(T7), touchRead(T8), touchRead(T9));  // get value using T0
+  //Serial.printf("w(%s) %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n",
+    // (stateChange?"true":"false"),
+    // // touchState[0], touchState[1], touchState[2], touchState[3], touchState[4],
+    // // touchState[5], touchState[6], touchState[7]);
+    // touchRead(T0), touchRead(T1), touchRead(T2), touchRead(T3), touchRead(T4), touchRead(T5), touchRead(T6), touchRead(T7), touchRead(T8), touchRead(T9));  // get value using T0
   delay(50);
 }
 

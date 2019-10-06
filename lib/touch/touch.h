@@ -17,6 +17,8 @@ class TouchDevice: public Device {
     boolean initialised = false;
 
     int threshold = 40;
+    // Don't use T1 - its connected to reset
+    uint8_t pinMap[8] = {T0, T8, T2, T3, T4, T5, T6, T7};
     bool current[8] = {false,false,false,false,false,false,false,false};
     bool last[8] = {false,false,false,false,false,false,false,false};
     bool touchState[8] = {false,false,false,false,false,false,false,false};
