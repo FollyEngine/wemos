@@ -61,10 +61,11 @@ void setup() {
 //  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
+// pins 19&20 / D1&D2 / GPIO4 and GPOI5
 // uses I2C, defaule address 0x30
 // devices[deviceCount++] = new MotorDevice(&mqtt);
 
-// uses pin2 and xxx
+// use D3 and D6
 devices[deviceCount++] = new ServoDevice(&mqtt);
 
 
