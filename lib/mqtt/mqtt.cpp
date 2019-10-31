@@ -97,16 +97,20 @@ void Mqtt::setup() {
   {
     bool reInit = true;
 
+    int resetCounter = 0;
     while (!client.connected())
     {
+      resetCounter++;
+      if (resetCounter > 20) {
+        Serial.printf("Too many failures, restarting.....\r\n");
+        ESP.restart();
+      }
       reInit = false;
       while (!client.connected())
       {
-        Serial.println("Wifi Connected:");
-        Serial.println(WiFi.localIP());
-        Serial.println(m_Hostname);
-
-        Serial.printf("Host %s, Port %d\r\n", m_MQTTServer, m_MQTTPort);
+        delay(300);
+        Serial.printf("(%d) Wifi Connected (%d) : %s, %s\r\n", resetCounter, WiFi.status(), m_Hostname, WiFi.localIP().toString().c_str());
+        Serial.printf("MQTT Host %s, Port %d\r\n", m_MQTTServer, m_MQTTPort);
         boolean ok;
         if (m_MqttPass == NULL)
         {
@@ -117,9 +121,9 @@ void Mqtt::setup() {
           ok = client.connect(m_Hostname, m_MqttUser, m_MqttPass);
         }
         Serial.printf("MQTT: %s (state: %d)\r\n", (ok ? "true" : "false"), client.state());
-        //Serial.println("+");
       }
       client.setCallback(callback);
+      // and here we need to re-init the subscriptions
     }
     client.loop();
 

@@ -27,7 +27,7 @@ void TouchDevice::loop() {
   StaticJsonDocument<300> root;
   char name[16];
 
-  mqtt->loop();
+  initialised = mqtt->loop();
 
   bool stateChange = false;
   for (int i=0; i<8; i++) {

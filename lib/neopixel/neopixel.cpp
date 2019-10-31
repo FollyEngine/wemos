@@ -29,16 +29,20 @@ void NeopixelString::setup() {
 
   //left_leds.setBrightness(BRIGHTNESS);
   //left_leds.show();                // turn on all pixels
+  subscribe();
+}
+
+void NeopixelString::subscribe() {
+    initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "twinkle");
+    initialised = mqtt->subscribe("all", deviceType, "twinkle");
+    Serial.printf("loop Subscription returned: %s\n", initialised ? "true" : "false");
 }
 
 void NeopixelString::loop() {
   if (!initialised) {
     digitalWrite(ledPin, HIGH);
 
-    delay(1);
-    initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "twinkle");
-    initialised = mqtt->subscribe("all", deviceType, "twinkle");
-    Serial.printf("loop Subscription returned: %s\n", initialised ? "true" : "false");
+    delay(100);
 
     setup();
   }

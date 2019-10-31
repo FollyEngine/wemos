@@ -20,7 +20,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt.home.org.au", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.10.11.202", 1883, "multipass");
 
 Device *devices[5];
 int deviceCount = 0;
@@ -44,7 +44,9 @@ void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int l
 void setup() {
   //while (!Serial);
   Serial.begin(115200);
-  Serial.printf("Started\n");
+  int startDelay = random(100) * 100;
+  Serial.printf("Started, delaying %d mS\r\n", startDelay);
+  delay(startDelay);
 
 // D4 is the default pin for the 6 LED RBG shield
 // https://wiki.wemos.cc/products:d1_mini_shields:rgb_led_shield
@@ -56,9 +58,9 @@ void setup() {
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
-//#define LEDPIN   D5
-//#define LED_NUM 50
-//  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+#define LEDPIN   D5
+#define LED_NUM 50
+ devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
 // pins 19&20 / D1&D2 / GPIO4 and GPOI5
@@ -66,15 +68,16 @@ void setup() {
 // devices[deviceCount++] = new MotorDevice(&mqtt);
 
 // use D3 and D6
-devices[deviceCount++] = new ServoDevice(&mqtt);
+//devices[deviceCount++] = new ServoDevice(&mqtt);
 
 
-// devices[deviceCount++] = new TouchDevice(&mqtt);  <<<<<<<<<------ for the esp32
+//devices[deviceCount++] = new TouchDevice(&mqtt);  //<<<<<<<<<------ for the esp32
 
 
   //devices[0]->setup();
   for (int i = 0; i < deviceCount; i++) {
     devices[i]->setup();
+    devices[i]->subscribe();
   }
 
   // TODO: need to redo the callback thing so there's one callback per subscription that then gets the pre-parsed json
@@ -86,7 +89,11 @@ devices[deviceCount++] = new ServoDevice(&mqtt);
 void loop() {
   if (!mqtt.loop()) {
     // if we had to reinit, delay a little
-    delay(1);
+    delay(100);
+
+    for (int i = 0; i < deviceCount; i++) {
+      devices[i]->subscribe();
+    }
     return;
   }
 

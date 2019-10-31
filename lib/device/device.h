@@ -4,6 +4,7 @@
 class Device {
     public:
     virtual void setup();
+    virtual void subscribe();
     virtual void loop();
     virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
 };

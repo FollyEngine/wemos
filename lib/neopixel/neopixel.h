@@ -20,6 +20,7 @@ class NeopixelString: public Device {
     NeopixelString(uint16_t ledPin, uint16_t ledNum, neoPixelType type, Mqtt *mqtt);
 
     virtual void setup();
+    virtual void subscribe();
     virtual void loop();
     virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
 

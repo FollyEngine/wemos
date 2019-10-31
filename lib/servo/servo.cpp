@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 
 #include <Wire.h>
-#include <Servo.h>
+#include <Servo.h>  // esp8266 only
 
 
 char deviceType[] = "servo";
@@ -37,16 +37,18 @@ void ServoDevice::setup() {
 
 void ServoDevice::loop() {
   if (!initialised) {
-
     delay(1);
-    initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "angle");
-    initialised = mqtt->subscribe("all", deviceType, "angle");
-    Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
-
     setup();
+    subscribe();
   }
-
 }
+
+void ServoDevice::subscribe() {
+  initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "angle");
+  initialised = mqtt->subscribe("all", deviceType, "angle");
+  Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
+}
+
 
 void ServoDevice::mqtt_callback_fn(const char* topic, const char* payload, unsigned int length) {
   // 10 elements in the json payload?
