@@ -30,16 +30,19 @@ void MotorDevice::setup() {
   motor.changeDuty(MOTOR_CH_A, 0);
   motor.changeDuty(MOTOR_CH_B, 0);
   motor.changeStatus(MOTOR_CH_BOTH, MOTOR_STATUS_STANDBY);
+
+  subscribe();
+}
+
+void MotorDevice::subscribe() {
+    initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "speed");
+    initialised = mqtt->subscribe("all", deviceType, "speed");
+    Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
 }
 
 void MotorDevice::loop() {
   if (!initialised) {
-
     delay(1);
-    initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "speed");
-    initialised = mqtt->subscribe("all", deviceType, "speed");
-    Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
-
     setup();
   }
 

@@ -100,7 +100,7 @@ void Mqtt::setup() {
     int resetCounter = 0;
     while (!client.connected())
     {
-      resetCounter++;
+      resetCounter = resetCounter++;
       if (resetCounter > 20) {
         Serial.printf("Too many failures, restarting.....\r\n");
         ESP.restart();
@@ -109,7 +109,7 @@ void Mqtt::setup() {
       while (!client.connected())
       {
         delay(300);
-        Serial.printf("(%d) Wifi Connected (%d) : %s, %s\r\n", resetCounter, WiFi.status(), m_Hostname, WiFi.localIP().toString().c_str());
+        Serial.printf("(reset:%d) Wifi Connected (%d) : %s, %s\r\n", resetCounter, WiFi.status(), m_Hostname, WiFi.localIP().toString().c_str());
         Serial.printf("MQTT Host %s, Port %d\r\n", m_MQTTServer, m_MQTTPort);
         boolean ok;
         if (m_MqttPass == NULL)

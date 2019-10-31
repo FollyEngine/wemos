@@ -2,10 +2,12 @@
 #include <mqtt.h>
 #include <neopixel.h>
 #include <motor.h>
+//#ifdef ESP8266
 #include <servo.h>
-
+//#else
 // esp32 only
 //#include <touch.h>
+//#endif
 
 //
 //breif:
@@ -60,12 +62,12 @@ void setup() {
 // example for more information on possible values.
 #define LEDPIN   D5
 #define LED_NUM 50
- devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
 // pins 19&20 / D1&D2 / GPIO4 and GPOI5
 // uses I2C, defaule address 0x30
-// devices[deviceCount++] = new MotorDevice(&mqtt);
+//devices[deviceCount++] = new MotorDevice(&mqtt);
 
 // use D3 and D6
 //devices[deviceCount++] = new ServoDevice(&mqtt);

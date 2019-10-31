@@ -13,6 +13,10 @@ void TouchDevice::setup() {
   threshold = 40;
 }
 
+void TouchDevice::subscribe() {
+
+}
+
 void TouchDevice::loop() {
   if (!initialised) {
 
@@ -31,6 +35,9 @@ void TouchDevice::loop() {
 
   bool stateChange = false;
   for (int i=0; i<8; i++) {
+    if (i == 7) {
+      continue; // touch 7 was giving us trouble
+    }
     int16_t reading = touchRead(pinMap[i]);
     if (reading <= threshold) {
       current[i] = true;
