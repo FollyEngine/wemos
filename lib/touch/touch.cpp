@@ -39,6 +39,7 @@ void TouchDevice::loop() {
       continue; // touch 7 was giving us trouble
     }
     int16_t reading = touchRead(pinMap[i]);
+
     if (reading <= threshold) {
       current[i] = true;
     }
@@ -46,7 +47,11 @@ void TouchDevice::loop() {
       // need to report this as a state change.
       stateChange = true;
       touchState[i] = current[i];
-      Serial.printf("Touch %d detected\r\n", i);
+      if (current[i]) {
+        Serial.printf("Touch %d detected (reading: %d)\r\n", i, reading);
+      } else {
+        Serial.printf("Touch %d released (reading: %d)\r\n", i, reading);
+      }
       snprintf(name, 16, "touch%d", i);
       root[name] = touchState[i];
     }
