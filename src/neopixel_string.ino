@@ -22,7 +22,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.10.11.202", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "pi.hole", 1883, "multipass");
 
 Device *devices[5];
 int deviceCount = 0;
@@ -35,10 +35,24 @@ void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int l
   payload[length] = 0;
   Serial.printf("Callback: %s: %s\r\n", topic, payload);
 
+  if (strncmp("all/", topic, 4) == 0) {
+    topic = topic+4;
+  } else {
+    const char *hostname = mqtt.getHostname();
+    size_t length = strlen(hostname);
+    if (strncmp(hostname, topic, length) == 0) {
+      topic = topic+length+1;
+    } else {
+        Serial.printf("ERROR: topic(%s) didn't start with all/ or %s\r\n", topic, hostname);
+    }
+  }
   // THIS NEEDS TO FIGURE OUT THE RIGHT DEVICE TO call
   // AND send to multiple for "all"
     for (int i = 0; i < deviceCount; i++) {
-      devices[i]->mqtt_callback_fn(topic, payload, length);
+      const char *message = devices[i]->IsMessageForMe(topic);
+      if (message != NULL){
+        devices[i]->mqtt_callback_fn(topic, payload, length);
+      }
     }
 }
 
@@ -53,16 +67,16 @@ void setup() {
 // D4 is the default pin for the 6 LED RBG shield
 // https://wiki.wemos.cc/products:d1_mini_shields:rgb_led_shield
 // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
-// #define LEDPIN   D4
-// #define LED_NUM 7
-//  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+#define LEDPIN   D4
+#define LED_NUM 7
+devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
 
 // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
 // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
 // example for more information on possible values.
-#define LEDPIN   D5
-#define LED_NUM 50
-devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+// #define LEDPIN   D5
+// #define LED_NUM 50
+// devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
 // pins 19&20 / D1&D2 / GPIO4 and GPOI5

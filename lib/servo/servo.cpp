@@ -35,6 +35,14 @@ void ServoDevice::setup() {
   servo2.attach(ServoPin2);
 }
 
+const char *ServoDevice::IsMessageForMe(const char * topic) {
+  size_t length = strlen(ServoDevice::deviceType);
+  if (strncmp(ServoDevice::deviceType, topic, length) == 0) {
+    return topic+length+1;
+  }
+  return NULL;
+}
+
 void ServoDevice::loop() {
   if (!initialised) {
     delay(1);

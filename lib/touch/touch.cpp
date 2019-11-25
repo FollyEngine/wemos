@@ -17,6 +17,14 @@ void TouchDevice::subscribe() {
 
 }
 
+const char *TouchDevice::IsMessageForMe(const char * topic) {
+  size_t length = strlen(TouchDevice::deviceType);
+  if (strncmp(TouchDevice::deviceType, topic, length) == 0) {
+    return topic+length+1;
+  }
+  return NULL;
+}
+
 void TouchDevice::loop() {
   if (!initialised) {
 

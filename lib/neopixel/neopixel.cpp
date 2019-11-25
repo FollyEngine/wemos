@@ -38,6 +38,14 @@ void NeopixelString::subscribe() {
     Serial.printf("loop Subscription returned: %s\n", initialised ? "true" : "false");
 }
 
+const char *NeopixelString::IsMessageForMe(const char * topic) {
+  size_t length = strlen(NeopixelString::deviceType);
+  if (strncmp(NeopixelString::deviceType, topic, length) == 0) {
+    return topic+length+1;
+  }
+  return NULL;
+}
+
 void NeopixelString::loop() {
   if (!initialised) {
     digitalWrite(ledPin, HIGH);

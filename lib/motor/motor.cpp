@@ -40,6 +40,14 @@ void MotorDevice::subscribe() {
     Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
 }
 
+const char *MotorDevice::IsMessageForMe(const char * topic) {
+  size_t length = strlen(MotorDevice::deviceType);
+  if (strncmp(MotorDevice::deviceType, topic, length) == 0) {
+    return topic+length+1;
+  }
+  return NULL;
+}
+
 void MotorDevice::loop() {
   if (!initialised) {
     delay(1);

@@ -11,6 +11,7 @@ class ServoDevice: public Device {
     virtual void setup();
     virtual void loop();
     virtual void subscribe();
+    virtual const char* IsMessageForMe(const char *topic);
     virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
 
     private:
