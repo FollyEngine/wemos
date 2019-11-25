@@ -10,7 +10,7 @@ LOLIN_I2C_MOTOR motor; //I2C address 0x30
 // LOLIN_I2C_MOTOR motor(DEFAULT_I2C_MOTOR_ADDRESS); //I2C address 0x30
 // LOLIN_I2C_MOTOR motor(your_address); //using customize I2C address
 
-char deviceType[] = "motor";
+char *MotorDevice::deviceType = "motor";
 
 // TODO: set brightness and colour set from mqtt payload
 //#define BRIGHTNESS 140   // 140 is reasonably bright

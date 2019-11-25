@@ -7,7 +7,7 @@
 #include <Servo.h>  // esp8266 only
 
 
-char deviceType[] = "servo";
+char *ServoDevice::deviceType = "servo";
 
 
 // mosquitto_pub -h mqtt -t esp8266-4c11aedd147/servo/angle -m '{"angle": 120}'

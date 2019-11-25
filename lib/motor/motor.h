@@ -14,6 +14,7 @@ class MotorDevice: public Device {
     virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
 
     private:
+    static char *deviceType;
     Mqtt *mqtt;
     boolean initialised = false;
 };

@@ -27,6 +27,7 @@ class NeopixelString: public Device {
     private:
     Adafruit_NeoPixel *left_leds;
 
+    static char *deviceType;
     Mqtt *mqtt;
     uint16_t ledPin;
     uint16_t ledNum;

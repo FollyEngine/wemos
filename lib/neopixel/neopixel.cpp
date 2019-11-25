@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include "helpers.h"
 
-char deviceType[] = "neopixel";
+char *NeopixelString::deviceType = "neopixel";
 
 // TODO: set brightness and colour set from mqtt payload
 //#define BRIGHTNESS 140   // 140 is reasonably bright

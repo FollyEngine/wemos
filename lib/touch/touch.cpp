@@ -1,7 +1,7 @@
 #include "touch.h"
 #include <ArduinoJson.h>
 
-char deviceType[] = "touch";
+char *TouchDevice::deviceType = "touch";
 
 TouchDevice::TouchDevice(Mqtt *m) {
     mqtt = m;
