@@ -3,14 +3,12 @@
 #ifdef ESP8266
 #include <servo.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-ESP8266WebServer server(80);
 #else
  //esp32 only
 // #include <touch.h>
-// #include <WebServer.h>
-// WebServer server(80);
 #endif
+
+#include <web.h>
 
 
 #include <mqtt.h>
@@ -109,36 +107,10 @@ void setup() {
   // TODO: need to redo the callback thing so there's one callback per subscription that then gets the pre-parsed json
   mqtt.setCallback(mqtt_callback_fn);
 
-  server.on("/", handle_root);
-  server.on("/metrics", handle_metrics);
-  server.begin();
+  web_setup(SECRET_PASSWORD);
 
   mqtt.setup();
 }
-
-void handle_metrics() {
-  Serial.println("OnConnect /metrics");
-  server.send(200, "text/plain; version=0.0.4", SendMetrics()); 
-}
-
-String SendMetrics() {
-  return "# HELP http_requests_total The total number of HTTP requests.\n"
-  "# TYPE http_requests_total counter\n"
-  "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000\n"
-  "http_requests_total{method=\"post\",code=\"400\"}    3 1395066363000\n";
-
-}
-
-
-void handle_root() {
-  Serial.println("OnConnect /");
-  server.send(200, "text/html", SendHTML()); 
-}
-
-String SendHTML() {
-  return "Hello\n";
-}
-
 
 
 void loop() {
@@ -156,7 +128,7 @@ void loop() {
   for (int i = 0; i < deviceCount; i++) {
     devices[i]->loop();
   }
-  server.handleClient();
+  web_loop();
 }
 
 
