@@ -1,13 +1,19 @@
 #include "secrets.h"
+#ifdef ESP8266
+#include <servo.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+ESP8266WebServer server(80);
+#else
+ //esp32 only
+// #include <touch.h>
+// #include <WebServer.h>
+// WebServer server(80);
+#endif
 #include <mqtt.h>
 #include <neopixel.h>
 #include <motor.h>
-//#ifdef ESP8266
-#include <servo.h>
-//#else
-// esp32 only
-//#include <touch.h>
-//#endif
+
 
 //
 //breif:
@@ -23,6 +29,7 @@
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
 Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "pi.hole", 1883, "multipass");
+
 
 Device *devices[5];
 int deviceCount = 0;
@@ -56,7 +63,6 @@ void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int l
     }
 }
 
-
 void setup() {
   //while (!Serial);
   Serial.begin(115200);
@@ -64,30 +70,31 @@ void setup() {
   Serial.printf("Started, delaying %d mS\r\n", startDelay);
   delay(startDelay);
 
-// D4 is the default pin for the 6 LED RBG shield
-// https://wiki.wemos.cc/products:d1_mini_shields:rgb_led_shield
-// https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
-#define LEDPIN   D4
-#define LED_NUM 7
-devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+#ifdef ESP8266
+  // D4 is the default pin for the 6 LED RBG shield
+  // https://wiki.wemos.cc/products:d1_mini_shields:rgb_led_shield
+  // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
+  #define LEDPIN   D4
+  #define LED_NUM 7
+  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
 
-// When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
-// Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
-// example for more information on possible values.
-// #define LEDPIN   D5
-// #define LED_NUM 50
-// devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
-
-
-// pins 19&20 / D1&D2 / GPIO4 and GPOI5
-// uses I2C, defaule address 0x30
-//devices[deviceCount++] = new MotorDevice(&mqtt);
-
-// use D3 and D6
-//devices[deviceCount++] = new ServoDevice(&mqtt);
+  // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
+  // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
+  // example for more information on possible values.
+  // #define LEDPIN   D5
+  // #define LED_NUM 50
+  // devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
-//devices[deviceCount++] = new TouchDevice(&mqtt);  //<<<<<<<<<------ for the esp32
+  // pins 19&20 / D1&D2 / GPIO4 and GPOI5
+  // uses I2C, defaule address 0x30
+  //devices[deviceCount++] = new MotorDevice(&mqtt);
+
+  // use D3 and D6
+  //devices[deviceCount++] = new ServoDevice(&mqtt);
+#else
+  devices[deviceCount++] = new TouchDevice(&mqtt);  //<<<<<<<<<------ for the esp32
+#endif
 
 
   //devices[0]->setup();
@@ -98,9 +105,38 @@ devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt);
 
   // TODO: need to redo the callback thing so there's one callback per subscription that then gets the pre-parsed json
   mqtt.setCallback(mqtt_callback_fn);
-  
+
+  server.on("/", handle_root);
+  server.on("/metrics", handle_metrics);
+  server.begin();
+
   mqtt.setup();
 }
+
+void handle_metrics() {
+  Serial.println("OnConnect /metrics");
+  server.send(200, "text/plain; version=0.0.4", SendMetrics()); 
+}
+
+String SendMetrics() {
+  return "# HELP http_requests_total The total number of HTTP requests.\n"
+  "# TYPE http_requests_total counter\n"
+  "http_requests_total{method=\"post\",code=\"200\"} 1027 1395066363000\n"
+  "http_requests_total{method=\"post\",code=\"400\"}    3 1395066363000\n";
+
+}
+
+
+void handle_root() {
+  Serial.println("OnConnect /");
+  server.send(200, "text/html", SendHTML()); 
+}
+
+String SendHTML() {
+  return "Hello\n";
+}
+
+
 
 void loop() {
   if (!mqtt.loop()) {
@@ -117,6 +153,7 @@ void loop() {
   for (int i = 0; i < deviceCount; i++) {
     devices[i]->loop();
   }
+  server.handleClient();
 }
 
 
