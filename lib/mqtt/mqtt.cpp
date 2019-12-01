@@ -5,6 +5,13 @@
 #include <Time.h>
 #include <NtpClientLib.h>
 
+#ifdef ESP8266
+#include <ESP8266mDNS.h>
+#else
+// #include <ESPmDNS.h>
+#endif
+
+
 Mqtt::Mqtt(
 		const char *SSID,
 		const char *PASS,
@@ -89,6 +96,12 @@ void Mqtt::setup() {
     client.setServer(m_MQTTServer, m_MQTTPort);
     client.setCallback(callback);
 
+    if (!MDNS.begin(m_Hostname)) {             // Start the mDNS responder for esp8266.local
+      Serial.println("Error setting up MDNS responder!");
+    } else {
+      Serial.printf("mDNS responder started (%s)\r\n", m_Hostname);
+    }
+
     StaticJsonDocument<300> root;
     status(root);
   };
@@ -138,6 +151,8 @@ void Mqtt::setup() {
         status(root);
       }
     }
+
+    MDNS.update();
 
     return reInit;
   };
