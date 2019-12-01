@@ -4,7 +4,7 @@
 #include <servo.h>
 #else
  //esp32 only
-// #include <touch.h>
+#include <touch.h>
 #endif
 
 #include <web.h>

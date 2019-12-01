@@ -6,10 +6,10 @@
 
 #ifdef ESP8266
 #include <ESP8266mDNS.h>
-#else
-// #include <ESPmDNS.h>
-#endif
 #include <NtpClientLib.h>
+#else
+#include <ESPmDNS.h>
+#endif
 
 
 Mqtt::Mqtt(
@@ -86,11 +86,13 @@ void Mqtt::setup() {
     Serial.println("Setup Wifi Connected:");
     Serial.println( WiFi.localIP());
 
+#ifdef ESP8266
     NTP.begin (); // Only statement needed to start NTP sync.
     //timeZone = 0;
     //minutesTimeZone = 0;
     //NTP.begin ("pool.ntp.org", timeZone, true, minutesTimeZone);
     //NTP.setInterval (63);
+#endif
 
     Serial.printf("Host %s, Port %d", m_MQTTServer, m_MQTTPort);
     client.setServer(m_MQTTServer, m_MQTTPort);
@@ -152,7 +154,9 @@ void Mqtt::setup() {
       }
     }
 
+#ifdef ESP8266
     MDNS.update();
+#endif
 
     return reInit;
   };
