@@ -3,13 +3,13 @@
 #include "mqtt.h"
 
 #include <Time.h>
-#include <NtpClientLib.h>
 
 #ifdef ESP8266
 #include <ESP8266mDNS.h>
 #else
 // #include <ESPmDNS.h>
 #endif
+#include <NtpClientLib.h>
 
 
 Mqtt::Mqtt(

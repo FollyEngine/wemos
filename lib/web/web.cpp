@@ -1,21 +1,15 @@
 #ifdef ESP8266
-#include <servo.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
-
-
-//#include <WiFiClient.h>
-//#include <FS.h>   // Include the SPIFFS library
-
-
-
+#include <WiFiClient.h>
 ESP8266WebServer server(80);
+ESP8266HTTPUpdateServer httpUpdate;
 
 // curl -u "admin:<password>" -F "image=@firmware.bin" esp8266-84f3eb3b7c66.local/folly
-ESP8266HTTPUpdateServer httpUpdater;
+//#include <FS.h>   // Include the SPIFFS library
 
 #else
  //esp32 only
@@ -23,12 +17,21 @@ ESP8266HTTPUpdateServer httpUpdater;
 // #include <WebServer.h>
 // WebServer server(80);
 #endif
+#include <AutoConnect.h>
+AutoConnect portal(server);
+AutoConnectAux update("/update", "Update");
+AutoConnectAux hello;                       // Step #8
+
+
+static const char HELLO_PAGE[] PROGMEM = R"(
+{ "title": "Hello world", "uri": "/", "menu": true, "element": [
+    { "name": "caption", "type": "ACText", "value": "<h2>Hello, world</h2>",  "style": "text-align:center;color:#2f4f4f;padding:10px;" },
+    { "name": "content", "type": "ACText", "value": "In this page, place the custom web page handled by the sketch application." } ]
+}
+)";
 
 const char* update_path = "/folly";
 const char* update_username = "admin";
-
-// SPIFF from https://tttapa.github.io/ESP8266/Chap12%20-%20Uploading%20to%20Server.html
-//File fsUploadFile;              // a File object to temporarily store the received file
 
 String SendMetrics() {
   return "# HELP http_requests_total The total number of HTTP requests.\n"
@@ -41,16 +44,6 @@ String SendMetrics() {
 void handle_metrics() {
   Serial.println("OnConnect /metrics");
   server.send(200, "text/plain; version=0.0.4", SendMetrics()); 
-}
-
-String SendHTML() {
-  return "Hostname: \n";
-}
-
-
-void handle_root() {
-  Serial.println("OnConnect /");
-  server.send(200, "text/html", SendHTML()); 
 }
 
 String getContentType(String filename) { // convert the file extension to the MIME type
@@ -80,57 +73,27 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
   return false;
 }
 
-// void handleFileUpload(){ // upload a new file to the SPIFFS
-//   HTTPUpload& upload = server.upload();
-//   if(upload.status == UPLOAD_FILE_START){
-//     String filename = upload.filename;
-//     if(!filename.startsWith("/")) filename = "/"+filename;
-//     Serial.print("handleFileUpload Name: "); Serial.println(filename);
-//     fsUploadFile = SPIFFS.open(filename, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
-//     filename = String();
-//   } else if(upload.status == UPLOAD_FILE_WRITE){
-//     if(fsUploadFile)
-//       fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
-//   } else if(upload.status == UPLOAD_FILE_END){
-//     if(fsUploadFile) {                                    // If the file was successfully created
-//       fsUploadFile.close();                               // Close the file again
-//       Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-//       server.sendHeader("Location","/success.html");      // Redirect the client to the success page
-//       server.send(303);
-//     } else {
-//       server.send(500, "text/plain", "500: couldn't create file");
-//     }
-//   }
-// }
 
 void web_setup(const char *update_password) {
 //  SPIFFS.begin();                           // Start the SPI Flash Files System
 
-  server.on("/", handle_root);
   server.on("/metrics", handle_metrics);
-//   server.on("/upload", HTTP_GET, []() {                 // if the client requests the upload page
-//     if (!handleFileRead("/upload.html"))                // send it if it exists
-//       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
-//   });
-
-//   server.on("/upload", HTTP_POST,                       // if the client posts to the upload page
-//     [](){ server.send(200); },                          // Send status 200 (OK) to tell the client we are ready to receive
-//     handleFileUpload                                    // Receive and save the file
-//   );
 
   server.onNotFound([]() {                              // If the client requests any URI
     if (!handleFileRead(server.uri()))                  // send it if it exists
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
 
-  httpUpdater.setup(&server, update_path, update_username, update_password);
-  server.begin();                           // Actually start the server
-
-  MDNS.addService("http", "tcp", 80);
+  httpUpdate.setup(&server, "folly", update_password);
+  hello.load(HELLO_PAGE);                                // Step #9.b
+  portal.join({hello, update});
+  if (portal.begin()) {                                  // Step #9.d
+    MDNS.addService("http", "tcp", 80);              // Step #9.e
+  }
   Serial.println("HTTP server started");
 
 }
 
 void web_loop() {
-    server.handleClient();
+    portal.handleClient();
 }

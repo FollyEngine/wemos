@@ -2,15 +2,12 @@
 
 #ifdef ESP8266
 #include <servo.h>
-#include <ESP8266WiFi.h>
 #else
  //esp32 only
 // #include <touch.h>
 #endif
 
 #include <web.h>
-
-
 #include <mqtt.h>
 #include <neopixel.h>
 #include <motor.h>
