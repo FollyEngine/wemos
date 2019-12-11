@@ -37,7 +37,7 @@ void MotorDevice::setup() {
 void MotorDevice::subscribe() {
     initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "speed");
     initialised = mqtt->subscribe("all", deviceType, "speed");
-    Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
+    Serial.printf("%s loop Subscription returned: %s\r\n", MotorDevice::deviceType, initialised ? "true" : "false");
 }
 
 const char *MotorDevice::IsMessageForMe(const char * topic) {

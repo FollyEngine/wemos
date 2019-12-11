@@ -35,7 +35,7 @@ void NeopixelString::setup() {
 void NeopixelString::subscribe() {
     initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "twinkle");
     initialised = mqtt->subscribe("all", deviceType, "twinkle");
-    Serial.printf("loop Subscription returned: %s\n", initialised ? "true" : "false");
+    Serial.printf("%s loop Subscription returned: %s\r\n", NeopixelString::deviceType, initialised ? "true" : "false");
 }
 
 const char *NeopixelString::IsMessageForMe(const char * topic) {

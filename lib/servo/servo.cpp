@@ -54,7 +54,7 @@ void ServoDevice::loop() {
 void ServoDevice::subscribe() {
   initialised = mqtt->subscribe(mqtt->getHostname(), deviceType, "angle");
   initialised = mqtt->subscribe("all", deviceType, "angle");
-  Serial.printf("loop Subscription returned: %s\r\n", initialised ? "true" : "false");
+  Serial.printf("%s loop Subscription returned: %s\r\n", ServoDevice::deviceType, initialised ? "true" : "false");
 }
 
 
