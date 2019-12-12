@@ -63,6 +63,7 @@ String getContentType(String filename) { // convert the file extension to the MI
 
 void web_setup(const char *update_password) {
 //  SPIFFS.begin();                           // Start the SPI Flash Files System
+  //server.authenticate("folly", update_password);
 
   server.on("/metrics", handle_metrics);
 

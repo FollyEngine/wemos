@@ -2,6 +2,12 @@
 
 #ifdef ESP8266
 #include <servo.h>
+
+#include <neopixel.h>
+#include <motor.h>
+#include <relay.h>
+#include <switch.h>
+
 #else
  //esp32 only
 #include <touch.h>
@@ -9,10 +15,6 @@
 
 #include <web.h>
 #include <mqtt.h>
-#include <neopixel.h>
-#include <motor.h>
-#include <relay.h>
-
 
 //
 //breif:
@@ -27,7 +29,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "192.168.43.84", 1883, "multipass");
 
 
 Device *devices[5];
@@ -75,7 +77,7 @@ void setup() {
   // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
   // #define LEDPIN   D4
   // #define LED_NUM 7
-  // devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
 
   // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
   // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
@@ -92,8 +94,10 @@ void setup() {
 
   // use D3 and D6
   //devices[deviceCount++] = new ServoDevice(&mqtt);
+  // use D3
+  devices[deviceCount++] = new SwitchDevice(&mqtt);
   // use D1
-  devices[deviceCount++] = new RelayDevice(&mqtt);
+  //devices[deviceCount++] = new RelayDevice(&mqtt);
 #else
   devices[deviceCount++] = new TouchDevice(&mqtt);  //<<<<<<<<<------ for the esp32
 #endif
