@@ -10,7 +10,14 @@
 char *ServoDevice::deviceType = "servo";
 
 
+// both to same angle (only used as a default, angle1 and angle2 override)
 // mosquitto_pub -h mqtt -t esp8266-4c11aedd147/servo/angle -m '{"angle": 120}'
+// servo 1
+// mosquitto_pub -h mqtt -t esp8266-4c11aedd147/servo/angle -m '{"angle1": 120}'
+// servo 2
+// mosquitto_pub -h mqtt -t esp8266-4c11aedd147/servo/angle -m '{"angle2": 120}'
+// servo 1 and 2 to different angles
+// mosquitto_pub -h mqtt -t esp8266-4c11aedd147/servo/angle -m '{"angle1": 95, "angle2": 120}'
 
 // use D3 (GPIO0) and 
 #define ServoPin1 00
@@ -69,8 +76,14 @@ void ServoDevice::mqtt_callback_fn(const char* topic, const char* payload, unsig
     return;
   }
 
-  int angle = obj["angle"] | 0;
-  Serial.printf("Servo angle: %d\r\n", angle);
-  servo1.write(angle);   // tell servo to go to position
-  servo2.write(angle);   // tell servo to go to position
+  int angle = obj["angle"] | 999;
+  int angle1 = obj["angle1"] | angle;
+  int angle2 = obj["angle2"] | angle;
+  Serial.printf("Servo angle1: %d, angle1: %d\r\n", angle1, angle2);
+  if (angle1 != 999) {
+    servo1.write(angle1);   // tell servo to go to position
+  }
+  if (angle2 != 999) {
+    servo2.write(angle2);   // tell servo to go to position
+  }
 }

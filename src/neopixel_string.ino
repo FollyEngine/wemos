@@ -29,7 +29,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "192.168.43.84", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt", 1883, "multipass");
 
 
 Device *devices[5];
@@ -93,9 +93,9 @@ void setup() {
   //devices[deviceCount++] = new MotorDevice(&mqtt);
 
   // use D3 and D6
-  //devices[deviceCount++] = new ServoDevice(&mqtt);
+  devices[deviceCount++] = new ServoDevice(&mqtt);
   // use D3
-  devices[deviceCount++] = new SwitchDevice(&mqtt);
+  //devices[deviceCount++] = new SwitchDevice(&mqtt);
   // use D1
   //devices[deviceCount++] = new RelayDevice(&mqtt);
 #else
