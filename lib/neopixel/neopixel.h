@@ -28,7 +28,7 @@ class NeopixelString: public Device {
     private:
     Adafruit_NeoPixel *left_leds;
 
-    static char *deviceType;
+    static const char *deviceType;
     Mqtt *mqtt;
     uint16_t ledPin;
     uint16_t ledNum;
@@ -37,8 +37,10 @@ class NeopixelString: public Device {
     boolean initialised = false;
     boolean inLoop = false;
 
-    unsigned long twinkleDelay;
-    unsigned long twinkleUntil = 0;
+    const char* operation = NULL;
+    unsigned long operationDelay;
+    unsigned long operationDuration = 0;
+    StaticJsonDocument<500> obj;
 };
 
 #endif

@@ -29,7 +29,7 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt", 1883, "multipass");
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.11.11.10", 1883, "multipass");
 
 
 Device *devices[5];
@@ -77,14 +77,14 @@ void setup() {
   // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
   // #define LEDPIN   D4
   // #define LED_NUM 7
-  devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+  //devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
 
   // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
   // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
   // example for more information on possible values.
   #define LEDPIN   D5
   #define LED_NUM 50
-  //devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
   // pins 19&20 / D1&D2 / GPIO4 and GPOI5
@@ -93,7 +93,7 @@ void setup() {
   //devices[deviceCount++] = new MotorDevice(&mqtt);
 
   // use D3 and D6
-  devices[deviceCount++] = new ServoDevice(&mqtt);
+  //devices[deviceCount++] = new ServoDevice(&mqtt);
   // use D3
   //devices[deviceCount++] = new SwitchDevice(&mqtt);
   // use D1

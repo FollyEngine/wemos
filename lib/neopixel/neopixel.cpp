@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include "helpers.h"
 
-char *NeopixelString::deviceType = "neopixel";
+const char *NeopixelString::deviceType = "neopixel";
 
 // TODO: set brightness and colour set from mqtt payload
 //#define BRIGHTNESS 140   // 140 is reasonably bright
@@ -55,28 +55,43 @@ void NeopixelString::loop() {
     setup();
   }
 
-  if (twinkleUntil > millis()) {
-    // sparkle each led once (but in random order, so some of them might sparkle twice and some not at all)
-    // TODO actually just choose a random LED and sparkle it, since this loop now repeats every time
-    //for (int i = 0; i < ledNum; i++) {
-    pixie_dust(*left_leds, 5, twinkleDelay);
-    //}
+  if (operationDuration > millis()) {
+    if (strcmp(operation, "twinkle") == 0) {
+      // sparkle each led once (but in random order, so some of them might sparkle twice and some not at all)
+      // TODO actually just choose a random LED and sparkle it, since this loop now repeats every time
+      //for (int i = 0; i < ledNum; i++) {
+      pixie_dust(*left_leds, 5, operationDelay);
+      //}
+    }
+    if (strcmp(operation, "disco") == 0) {
+      JsonArrayConst colours = obj["colours"];
+      for (int i=0; i < colours.size(); i++) {
+        //Serial.println(v.as<String>());
+        String colour = colours[i].as<String>();
+        Serial.printf("disco: %s\r\n", colour.c_str());
+        updateColour(*left_leds, colour.c_str());
+        delay(operationDelay);
+      }
+    }
   }
 }
 
 
 void NeopixelString::mqtt_callback_fn(const char* topic, const char* payload, unsigned int length) {
+  if (operationDuration > millis()) {
+    Serial.printf("busy, ignoring %s\r\n", payload);
+    return; // we're busy, so ignore other messages
+  }
   // 10 elements in the json payload?
 //   DynamicJsonBuffer jb(JSON_OBJECT_SIZE(10));
 //   JsonObject& obj = jb.parseObject(payload);
-  StaticJsonDocument<300> obj;
   DeserializationError error = deserializeJson(obj, payload);
   if (error) {
     Serial.printf("Failed to parse JSON: %s\n", error.c_str());
     return;
   }
 
-  const char* operation = obj["operation"];
+  operation = obj["operation"];
   if (operation != NULL) {
     if (strcmp(operation, "setrgb") == 0) {
       const int red = obj["r"] | 0;
@@ -92,8 +107,24 @@ void NeopixelString::mqtt_callback_fn(const char* topic, const char* payload, un
     }
     if (strcmp(operation, "twinkle") == 0) {
       unsigned long duration = obj["duration"] | 1000; // default to one second
-      twinkleDelay = obj["delay"] | 5;
-      twinkleUntil = millis() + duration;
+      operationDuration = millis() + duration;
+      operationDelay = obj["delay"] | 5;
+    }
+    if (strcmp(operation, "disco") == 0) {
+      unsigned long duration = obj["duration"] | 1000; // default to one second
+      operationDuration = millis() + duration;
+      operationDelay = obj["delay"] | 100;
+      // Scan in a sequence and the mushrooms change constantly like disco lights for 30 seconds 
+      // (1. Pink, 2. Green, 3. Blue, 4. Yellow)
+      // can send duration=30s, delay=0.5(s), colours=[rgb, rbg, rgb, colourname] ?
+    }
+    if (strcmp(operation, "transition") == 0) {
+      unsigned long duration = obj["duration"] | 1000; // default to one second
+      operationDuration = millis() + duration;
+      operationDelay = obj["delay"] | 100;
+      // smooth transition from colour ot colour
+      // can send duration=30s, delay=0.5(s), colours=[rgb, rbg, rgb, colourname] ?
+      // duration is total time, delay is time from one colour to the next
     }
   }
 }

@@ -13,7 +13,7 @@ void leds_set(Adafruit_NeoPixel &leds, uint8_t R, uint8_t G, uint8_t B) {
 
 uint8_t currentColours[3];
 typedef struct {
-  char* name;
+  const char* name;
   uint8_t colours[3];
 } colour_def;
 // from https://learn.adafruit.com/sparkle-skirt/code-battery
@@ -31,6 +31,7 @@ colour_def myFavoriteColors[] = {
   {"green", {0, 255, 0}},
   {"blue", {0, 0, 255}},
   {"yellow", {255, 255, 0}},
+  {"pink", {168, 0, 140}}
 };
 #define FAVCOLORS 11u
 
@@ -53,7 +54,7 @@ void updateColourRGB(Adafruit_NeoPixel &leds, int red, int green, int blue) {
 
 
 void updateColour(Adafruit_NeoPixel &leds, const char * colourName) {
-  for (int i = 0; i < FAVCOLORS; i++) {
+  for (uint i = 0; i < FAVCOLORS; i++) {
     if (strcmp(colourName, myFavoriteColors[i].name) == 0) {
       colour = i;
       break;
