@@ -4,7 +4,9 @@
 
 #include <device.h>
 #include <mqtt.h>
-#include <Adafruit_NeoPixel.h>
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_ALLOW_INTERRUPTS 0
+#include <FastLED.h>
 
 class NeopixelString: public Device {
     public:
@@ -17,7 +19,7 @@ class NeopixelString: public Device {
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
-    NeopixelString(uint16_t ledPin, uint16_t ledNum, neoPixelType type, Mqtt *mqtt);
+    NeopixelString(CRGB *leds, uint len, Mqtt *mqtt);
 
     virtual void setup();
     virtual void subscribe();
@@ -26,13 +28,11 @@ class NeopixelString: public Device {
     virtual void mqtt_callback_fn(const char* topic, const char* payload, unsigned int length);
 
     private:
-    Adafruit_NeoPixel *left_leds;
+    CRGB *left_leds;
+    uint ledLen;
 
     static const char *deviceType;
     Mqtt *mqtt;
-    uint16_t ledPin;
-    uint16_t ledNum;
-    neoPixelType ledType;
 
     boolean initialised = false;
     boolean inLoop = false;

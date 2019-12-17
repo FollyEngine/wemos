@@ -35,6 +35,13 @@ Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.11.11.10", 1883, "multipass")
 Device *devices[5];
 int deviceCount = 0;
 
+
+// #define FASTLED_ESP8266_RAW_PIN_ORDER
+// #define FASTLED_ALLOW_INTERRUPTS 0
+// #include <FastLED.h>
+#define NUM_LEDS 50
+CRGB leds[NUM_LEDS];
+
 void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int length) {
   Serial.printf("Callback: %s\r\n", topic);
 
@@ -83,8 +90,12 @@ void setup() {
   // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
   // example for more information on possible values.
   #define LEDPIN   D5
-  #define LED_NUM 50
-  devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
+  FastLED.addLeds<WS2812, D5, RGB>(leds, NUM_LEDS);
+  //CRGBArray<LED_NUM> left_leds;
+  //FastLED.addLeds<NEOPIXEL, LEDPIN>(left_leds, LED_NUM);
+  //left_leds = CRGB::HotPink;
+  devices[deviceCount++] = new NeopixelString(leds, NUM_LEDS, &mqtt); // RGB
+  //devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
 
 
   // pins 19&20 / D1&D2 / GPIO4 and GPOI5
