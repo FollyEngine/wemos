@@ -37,3 +37,7 @@ delay and duration are in milliseconds
   "delay": 3
 }
 ```
+
+## build instructions
+
+1 create a `src/secrets.h` containing `#define SECRET_SSID` and `#define SECRET_PASSWORD`

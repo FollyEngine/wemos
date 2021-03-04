@@ -9,7 +9,7 @@
 #include <switch.h>
 
 #else
- //esp32 only
+//esp32 only
 #include <touch.h>
 #endif
 
@@ -29,12 +29,10 @@
 // GO READ https://www.tweaking4all.com/hardware/arduino/adruino-led-strip-effects/
 
 //BUILD with "LOLIN(WEMOS) D1 R2 & mini"
-Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "10.11.11.10", 1883, "multipass");
-
+Mqtt mqtt = Mqtt(SECRET_SSID, SECRET_PASSWORD, "mqtt", 1883, "multipass");
 
 Device *devices[5];
 int deviceCount = 0;
-
 
 // #define FASTLED_ESP8266_RAW_PIN_ORDER
 // #define FASTLED_ALLOW_INTERRUPTS 0
@@ -42,36 +40,46 @@ int deviceCount = 0;
 #define NUM_LEDS 50
 CRGB leds[NUM_LEDS];
 
-void mqtt_callback_fn(const char* topic, const byte* raw_payload, unsigned int length) {
+void mqtt_callback_fn(const char *topic, const byte *raw_payload, unsigned int length)
+{
   Serial.printf("Callback: %s\r\n", topic);
 
   char payload[256];
-  strncpy(payload, (char *) raw_payload, length);
+  strncpy(payload, (char *)raw_payload, length);
   payload[length] = 0;
   Serial.printf("Callback: %s: %s\r\n", topic, payload);
 
-  if (strncmp("all/", topic, 4) == 0) {
-    topic = topic+4;
-  } else {
+  if (strncmp("all/", topic, 4) == 0)
+  {
+    topic = topic + 4;
+  }
+  else
+  {
     const char *hostname = mqtt.getHostname();
     size_t length = strlen(hostname);
-    if (strncmp(hostname, topic, length) == 0) {
-      topic = topic+length+1;
-    } else {
-        Serial.printf("ERROR: topic(%s) didn't start with all/ or %s\r\n", topic, hostname);
+    if (strncmp(hostname, topic, length) == 0)
+    {
+      topic = topic + length + 1;
+    }
+    else
+    {
+      Serial.printf("ERROR: topic(%s) didn't start with all/ or %s\r\n", topic, hostname);
     }
   }
   // THIS NEEDS TO FIGURE OUT THE RIGHT DEVICE TO call
   // AND send to multiple for "all"
-    for (int i = 0; i < deviceCount; i++) {
-      const char *message = devices[i]->IsMessageForMe(topic);
-      if (message != NULL){
-        devices[i]->mqtt_callback_fn(topic, payload, length);
-      }
+  for (int i = 0; i < deviceCount; i++)
+  {
+    const char *message = devices[i]->IsMessageForMe(topic);
+    if (message != NULL)
+    {
+      devices[i]->mqtt_callback_fn(topic, payload, length);
     }
+  }
 }
 
-void setup() {
+void setup()
+{
   //while (!Serial);
   Serial.begin(115200);
   int startDelay = random(100) * 100;
@@ -84,19 +92,20 @@ void setup() {
   // https://github.com/wemos/D1_mini_Examples/blob/master/examples/04.Shields/RGB_LED_Shield/simple/simple.ino
   // #define LEDPIN   D4
   // #define LED_NUM 7
-  //devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+  // devices[deviceCount++] = new NeopixelString(D4, 7, NEO_GRB + NEO_KHZ800, &mqtt); // GRB
+  //FastLED.addLeds<WS2812, D4, GRB>(leds, 7);
+  //devices[deviceCount++] = new NeopixelString(leds, 7, &mqtt); // RGB
 
   // When we setup the NeoPixel library, we tell it how many pixels, and which pin to use to send signals.
   // Note that for older NeoPixel strips you might need to change the third parameter--see the strandtest
   // example for more information on possible values.
-  #define LEDPIN   D5
-  FastLED.addLeds<WS2812, D5, RGB>(leds, NUM_LEDS);
+  // #define LEDPIN   D5
+  // FastLED.addLeds<WS2812, D5, RGB>(leds, NUM_LEDS);
   //CRGBArray<LED_NUM> left_leds;
   //FastLED.addLeds<NEOPIXEL, LEDPIN>(left_leds, LED_NUM);
   //left_leds = CRGB::HotPink;
-  devices[deviceCount++] = new NeopixelString(leds, NUM_LEDS, &mqtt); // RGB
+  //devices[deviceCount++] = new NeopixelString(leds, NUM_LEDS, &mqtt); // RGB
   //devices[deviceCount++] = new NeopixelString(D5, 50, NEO_RGB + NEO_KHZ800, &mqtt); // RGB
-
 
   // pins 19&20 / D1&D2 / GPIO4 and GPOI5
   // uses I2C, defaule address 0x30
@@ -106,13 +115,12 @@ void setup() {
   // use D3 and D6
   //devices[deviceCount++] = new ServoDevice(&mqtt);
   // use D3
-  //devices[deviceCount++] = new SwitchDevice(&mqtt);
+  devices[deviceCount++] = new SwitchDevice(&mqtt);
   // use D1
   //devices[deviceCount++] = new RelayDevice(&mqtt);
 #else
-  devices[deviceCount++] = new TouchDevice(&mqtt);  //<<<<<<<<<------ for the esp32
+  devices[deviceCount++] = new TouchDevice(&mqtt); //<<<<<<<<<------ for the esp32
 #endif
-
 
   mqtt.setup();
   Serial.printf("All set up\r\n");
@@ -120,36 +128,36 @@ void setup() {
   Serial.printf("web set up\r\n");
 
   //devices[0]->setup();
-  for (int i = 0; i < deviceCount; i++) {
+  for (int i = 0; i < deviceCount; i++)
+  {
     devices[i]->setup();
     devices[i]->subscribe();
   }
   Serial.printf("subscribe set up\r\n");
-
-
 
   // TODO: need to redo the callback thing so there's one callback per subscription that then gets the pre-parsed json
   mqtt.setCallback(mqtt_callback_fn);
   Serial.printf("callback set up\r\n");
 }
 
-
-void loop() {
-  if (!mqtt.loop()) {
+void loop()
+{
+  if (!mqtt.loop())
+  {
     // if we had to reinit, delay a little
     delay(100);
 
-    for (int i = 0; i < deviceCount; i++) {
+    for (int i = 0; i < deviceCount; i++)
+    {
       devices[i]->subscribe();
     }
     return;
   }
 
   // devices[0]->loop();
-  for (int i = 0; i < deviceCount; i++) {
+  for (int i = 0; i < deviceCount; i++)
+  {
     devices[i]->loop();
   }
   web_loop();
 }
-
-
