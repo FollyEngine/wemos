@@ -10,6 +10,8 @@
 ButtonNode button("button", "test", D3); // GPIO0
 // TODO: Get the battery level (need resistor&Analog pin) - https://hutscape.com/tutorials/measure-battery-voltage
 #endif
+
+#ifdef RELAYANDRGBBOARD
 #include "RelayNode.hpp" // https://github.com/luebbe/homie-node-collection#relaynode
 // default wemos board: https://www.wemos.cc/en/latest/d1_mini_shield/relay.html
 RelayNode relay("relay", "test", D1); // GPIO5
@@ -24,6 +26,11 @@ WS2812Node neopixels("neopixel", "seven", FX_MODE_FIRE_FLICKER_SOFT, NEO_GRB + N
 LoggerNode LN; // looks like the WS2812Node needs this..
 
 // PIR D3, GPIO0
+#endif
+
+#include <ServoNode.hpp>
+ServoNode servos1("servo", "one");
+ServoNode servos2("servo2", "two", ServoNode::ServoPin2);
 
 #define FW_NAME "folly-engine-nodes"
 #define FW_VERSION "0.0.1"
